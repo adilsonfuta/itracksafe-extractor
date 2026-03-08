@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { CreateItracksafeDto } from './dto/create-itracksafe.dto';
 import { UpdateItracksafeDto } from './dto/update-itracksafe.dto';
+import { ConfigService} from '@nestjs/config';
+import axios from 'axios';
 
 @Injectable()
 export class ItracksafeService {
-  create(createItracksafeDto: CreateItracksafeDto) {
-    return 'This action adds a new itracksafe';
-  }
 
-  findAll() {
-    return `This action returns all itracksafe`;
-  }
+     private token;
+      private baseUrl = 'https://itracksafe.com/webapi';
 
-  findOne(id: number) {
-    return `This action returns a #${id} itracksafe`;
-  }
+      constructor(private readonly configservice: ConfigService){
+            this.token = configservice.get('ITRACKSAFE_TOKEN');
+      }
 
-  update(id: number, updateItracksafeDto: UpdateItracksafeDto) {
-    return `This action updates a #${id} itracksafe`;
-  }
+    async queryTracks(deviceId: string, start: string, end: string){
+      //querytracks
+      const url = `${this.baseUrl}?action=querytracks&token=${this.token}`;
 
-  remove(id: number) {
-    return `This action removes a #${id} itracksafe`;
-  }
+      const { data } = await axios.post(url,{
+        deviceid: deviceId,
+        starttime: start,
+        endtime: end,
+        timezone: 8,
+      })
+
+      return data.record || data.data || [];
+
+    }
+
+
+
+
 }
