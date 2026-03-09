@@ -19,10 +19,33 @@ export class SchedulerService {
    // @Cron('0 1 * * *')
    @Cron('*/5 * * * *')
     async handleDailyExport(){
-        console.log('Daily extraction started ... ');
-        await this.exportservice.exportDaily(this.devices);
-        console.log('Daily extraction finished ... ');
+
+        console.log('Extraction started ... ');
+
+       // await this.exportservice.exportDaily(this.devices);
+        await this.exportservice.exportByDateRange( this.devices,
+            new Date('2026-03-01'),
+            new Date('2026-03-07'))
+
+        console.log('Extraction finished ... ');
     }
+
+
+    /**
+     * 
+await this.exportByDateRange(
+  devices,
+  new Date(),
+  new Date(),
+);
+     * 
+     */
+
+/*
+
+
+
+*/
 
 }
 
