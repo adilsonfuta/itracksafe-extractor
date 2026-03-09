@@ -34,7 +34,7 @@ export class ExportService {
 
     private formatDate(date: Date, time: string): string {
         const d = date.toISOString().slice(0,10);
-        return d;
+        return `${d} ${time}`;
     }
 
     private formateFolderDate(date:Date): string{
@@ -44,7 +44,9 @@ export class ExportService {
     async exportByDateRange(devices: string[], dateStart, dateEnd){
         const start = this.formatDate(dateStart,'00:00:00');
         const end = this.formatDate(dateEnd,'23:59:59');
-
+        
+        console.log('\n Query interval \n ',start,end);
+        
         const folderName  = `${this.formateFolderDate(dateStart)}_${this.formateFolderDate(dateEnd)}`;
         const folder = path.join('exports',folderName);
 
@@ -61,12 +63,6 @@ export class ExportService {
             ),
         );
     }
-
-
-
-
-
-
 
     private async retrywithBackoff(
         fn: () => Promise<any>,
@@ -96,8 +92,11 @@ export class ExportService {
             ()=> this.itrack.queryTracks(deviceId,start,end)
             );
 
+            console.log(tracks);
+            
+
             if (!tracks || tracks.length === 0) {
-                console.log(`Nenhum track encontrado para o device ${deviceId}`);
+                console.log(`\n Nenhum track para device: ${deviceId}\n`);
                 return;
             }
 

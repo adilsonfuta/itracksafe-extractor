@@ -9,15 +9,12 @@ import * as fs from 'fs';
 @Injectable()
 export class SchedulerService{
 
-    private cronStart;
+    //private cronStart;
+    //private devices = ["6038131591","6038131650","6038132052","6038078555","6038052969"];
 
-    constructor( private readonly exportservice: ExportService, private readonly configservice: ConfigService
-    ){
-            this.cronStart = this.configservice.get('ITRACKSAFE_CRON')!;
-    }
-
-  
-    private devices = ["6038131591","6038131650","6038132052","6038078555","6038052969"];
+    constructor(
+         private readonly exportservice: ExportService, 
+        private readonly configservice: ConfigService ){ }
 
       // carregar os devices de um arquivos ou arrays de devices
       private loadDevices():Device[]{
@@ -27,8 +24,7 @@ export class SchedulerService{
       }
     
    
-// @Cron('*/5 * * * *')
-  @Cron('0 /59 * * *')
+    @Cron('*/15 * * * *')
     async handleDailyExport(){
 
         const allDevices = this.loadDevices();
@@ -37,8 +33,8 @@ export class SchedulerService{
 
        // await this.exportservice.exportDaily(this.devices);
         await this.exportservice.exportByDateRange(deviceIds,
-            new Date('2026-03-01'),
-            new Date('2026-03-07'))
+            new Date('2026-03-07'),
+            new Date('2026-03-08'))
 
         console.log('Extraction finished ... ');
     }
