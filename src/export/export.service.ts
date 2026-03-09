@@ -8,10 +8,9 @@ import * as path from 'path';
 @Injectable()
 export class ExportService {
 
-    constructor(private readonly itrack: ItracksafeService) {
+    constructor(private readonly itrack: ItracksafeService) {}
 
-    }
-
+    // exportar os dados diariamente para csv, definir o caminho e o nome do arquivo 
     async exportDaily(devices: string[]) {
         const date = new Date().toISOString().slice(0, 10);
         const folder = path.join('date', date);

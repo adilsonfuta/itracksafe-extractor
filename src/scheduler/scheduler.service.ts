@@ -21,7 +21,7 @@ export class SchedulerService {
     async handleDailyExport(){
         console.log('Daily extraction started ... ');
         await this.exportservice.exportDaily(this.devices);
-        console.log('Daily extraction started ... ');
+        console.log('Daily extraction finished ... ');
     }
 
 }
