@@ -8,6 +8,7 @@ import { ExportService } from './export/export.service';
 import { ExportModule } from './export/export.module';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { LoggerConfig } from './helpers/logger.config';
 
 @Module({
   imports: [
@@ -15,11 +16,13 @@ import { ScheduleModule } from '@nestjs/schedule';
       isGlobal: true,
     }),
     ScheduleModule.forRoot(),
-    DatabaseModule, 
+    DatabaseModule,
     ItracksafeModule,
     SchedulerModule,
-     ExportModule],
+    ExportModule,
+  LoggerConfig],
   controllers: [AppController],
   providers: [AppService, ExportService],
+  exports:[]
 })
-export class AppModule {}
+export class AppModule { }
