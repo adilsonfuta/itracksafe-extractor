@@ -89,7 +89,7 @@ export class ExportService {
     folder: string,
   ) {
 
-    this.logger.debug(`Procesding device: ${deviceId} \n`);
+    this.logger.debug(`Processing device: ${deviceId} \n`);
 
     try {
     
@@ -128,7 +128,7 @@ export class ExportService {
 
       await csvWriter.writeRecords(tracks);
     } catch (error) {
-      this.logger.error(`Erro no device ${deviceId}`, error.message);
+      this.logger.error(`Error no device ${deviceId}`, error.message);
     }
   }
 }
