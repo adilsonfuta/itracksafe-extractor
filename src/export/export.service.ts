@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ItracksafeService } from 'src/itracksafe/itracksafe.service';
 import { createObjectCsvWriter } from 'csv-writer';
 import pLimit from 'p-limit';
@@ -8,6 +8,9 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ExportService {
+
+  private logger = new Logger(ExportService.name);
+
   constructor(
     private readonly itrack: ItracksafeService,
     private readonly configservice: ConfigService,
@@ -85,18 +88,23 @@ export class ExportService {
     end: string,
     folder: string,
   ) {
+
+    this.logger.debug(`Procesding device: ${deviceId} \n`);
+
     try {
     
     const tracks = await this.retrywithBackoff(() =>
         this.itrack.queryTracks(deviceId, start, end),
     );
 
-      console.log(tracks);
+      this.logger.log(tracks);
 
       if (!tracks || tracks.length === 0) {
-        console.log(`\n Nenhum track para device: ${deviceId}\n`);
+        this.logger.warn(`\n No track for device: ${deviceId}\n`);
         return;
       }
+
+       this.logger.log(`\n Exported ${tracks.length} tracks → ${deviceId} \n`);
 
       const csvWriter = createObjectCsvWriter({
         path: `${folder}/${deviceId}.csv`,
@@ -113,14 +121,14 @@ export class ExportService {
           { id: 'positioning', title: 'positioning' },
           { id: 'alarm', title: 'alarm' },
           { id: 'track_points', title: 'track_points' },
-          { id: 'starttime', title: 'starttime' },
-          { id: 'endtime', title: 'endtime' },
+          { id: 'start_time', title: 'start_time' },
+          { id: 'end_time', title: 'end_time' },
         ],
       });
 
       await csvWriter.writeRecords(tracks);
     } catch (error) {
-      console.error(`Erro no device ${deviceId}`, error.message);
+      this.logger.error(`Erro no device ${deviceId}`, error.message);
     }
   }
 }

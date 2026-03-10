@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ExportService } from "src/export/export.service";
 import { Cron } from '@nestjs/schedule';
 import { ConfigService } from "@nestjs/config";
@@ -13,10 +13,9 @@ export class SchedulerService{
 
     private itrackDateSart;
     private itrackDateEnd;
+    private logger = new Logger(SchedulerService.name)
 
-    constructor(
-         private readonly exportservice: ExportService, 
-        private readonly configservice: ConfigService ){
+    constructor(private readonly exportservice: ExportService, private readonly configservice: ConfigService ){
             this.itrackDateSart = this.configservice.get('ITRACKSAFE_DATE_START');
              this.itrackDateEnd = this.configservice.get('ITRACKSAFE_DATE_END');
          }
@@ -28,15 +27,21 @@ export class SchedulerService{
         return JSON.parse(raw);
       }
     
-   
+  
     @Cron('*/15 * * * *')
     async handleDailyExport(){
+        try {
 
         const allDevices = this.loadDevices();
         const deviceIds = allDevices.map(d => d.deviceid);
-        console.log('\n INICIALIZANDO A EXTRACAO ... \n');
+        this.logger.log('\n Extraction Started \n');
         await this.exportservice.exportByDateRange(deviceIds, new Date(this.itrackDateSart), new Date(this.itrackDateEnd));
-        console.log('\n FINALIZANDO A EXTRACAO \n');
+         this.logger.log('\n Extraction finished \n');
+            
+        } catch (error) {
+           this.logger.error(`\n Export Failed: ${error.stack} \n`); 
+        }
+
     }
 
 }

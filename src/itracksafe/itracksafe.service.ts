@@ -1,14 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
 @Injectable()
 export class ItracksafeService {
   private token;
-  private baseUrl = 'https://itracksafe.com/webapi';
+  private baseUrl;
+  private logger; //  = new Logger(ItracksafeService.name);
 
   constructor(private readonly configservice: ConfigService) {
     this.token = configservice.get('ITRACKSAFE_TOKEN');
+    this.baseUrl = configservice.get('ITRACKSAFE_BASE_URL');
+    this.logger = new Logger(ItracksafeService.name);
   }
 
   async queryTracks(deviceId: string, start: string, end: string) {
@@ -18,39 +21,52 @@ export class ItracksafeService {
       deviceid: deviceId,
       starttime: start,
       endtime: end,
-      timezone: 1, // UTC+1
+      timezone: 1,
     });
 
-    console.log(
-      JSON.stringify(data, null, 2) + ' \n ** GPS DATA DEVICES: ** \n',
-    );
+    // this.logger.log(`\n \n ${JSON.stringify(data, null, 2)}  `);
 
     const tracks = Array.isArray(data?.records) ? data.records : [];
 
     if (!tracks.length) {
-      console.log(`Nenhum track para device ${deviceId}`);
+      this.logger.warn(`Nenhum track para device ${deviceId}`);
       return [];
     }
 
-    console.log(`Encontrados ${tracks.length} registros`);
+     this.logger.warn(`Encontrados ${tracks.length} registros`);
 
-    return tracks.map((item) => ({
-      deviceid: deviceId,
-      datetime: item.updatetime,
-      latitude: item.callat,
-      longitude: item.callon,
-      speed_kmh: item.speed / 10, // converter km/h
-      course_deg: item.course,
 
-      status: item.strstatusen,
-      distance_m: '',
-      altitude_m: '',
-      positioning: item.gotsrc,
-      alarm: item.stralarmen ?? '',
-      track_points: '',
-      startime: item.starttime,
-      endtime: item.endtime,
-      
-    }));
-  }
+return tracks.map((item) => {
+
+  const speed = item.speed / 10;
+
+  return {
+    deviceid: deviceId,
+
+    datetime: new Date(item.updatetime).toISOString(),
+
+    latitude: item.callat,
+    longitude: item.callon,
+
+    speed_kmh: speed > 300 ? 0 : speed,
+    course_deg: item.course,
+
+    status: item.strstatusen,
+
+    distance_m: item.totaldistance,
+    altitude_m: item.altitude,
+
+    positioning: item.gotsrc,
+
+    alarm: item.stralarmen ?? '',
+
+    track_points: item.trackCount,
+
+    start_time: new Date(item.starttime).toISOString(),
+    end_time: new Date(item.endtime).toISOString(),
+  };
+});
+
+  
+}
 }

@@ -58,3 +58,23 @@ await this.exportByDateRange(
                 ]
 
     /*
+
+
+        return tracks.map((item) => ({
+      deviceid: deviceId,
+      datetime: item.updatetime,
+      latitude: item.callat,
+      longitude: item.callon,
+      speed_kmh: item.speed / 10, // converter km/h
+      course_deg: item.course,
+
+      status: item.strstatusen,
+      distance_m: '',
+      altitude_m: '',
+      positioning: item.gotsrc,
+      alarm: item.stralarmen ?? '',
+      track_points: '',
+      startime: item.starttime,
+      endtime: item.endtime,
+      
+    }));
