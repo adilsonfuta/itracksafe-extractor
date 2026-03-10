@@ -15,6 +15,4 @@ export default registerAs('config',() => ({
 
     },
     // port: parseInt(process.env.PORT)
-
-
 }));

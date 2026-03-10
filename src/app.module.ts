@@ -6,9 +6,19 @@ import { DatabaseModule } from './database/database.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { ExportService } from './export/export.service';
 import { ExportModule } from './export/export.module';
+import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [ItracksafeModule, DatabaseModule, SchedulerModule, ExportModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ScheduleModule.forRoot(),
+    DatabaseModule, 
+    ItracksafeModule,
+    SchedulerModule,
+     ExportModule],
   controllers: [AppController],
   providers: [AppService, ExportService],
 })
