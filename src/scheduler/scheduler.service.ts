@@ -9,12 +9,17 @@ import * as fs from 'fs';
 @Injectable()
 export class SchedulerService{
 
-    //private cronStart;
     //private devices = ["6038131591","6038131650","6038132052","6038078555","6038052969"];
+
+    private itrackDateSart;
+    private itrackDateEnd;
 
     constructor(
          private readonly exportservice: ExportService, 
-        private readonly configservice: ConfigService ){ }
+        private readonly configservice: ConfigService ){
+            this.itrackDateSart = this.configservice.get('ITRACKSAFE_DATE_START');
+             this.itrackDateEnd = this.configservice.get('ITRACKSAFE_DATE_END');
+         }
 
       // carregar os devices de um arquivos ou arrays de devices
       private loadDevices():Device[]{
@@ -29,14 +34,9 @@ export class SchedulerService{
 
         const allDevices = this.loadDevices();
         const deviceIds = allDevices.map(d => d.deviceid);
-        console.log('Extraction started ... ');
-
-       // await this.exportservice.exportDaily(this.devices);
-        await this.exportservice.exportByDateRange(deviceIds,
-            new Date('2026-03-07'),
-            new Date('2026-03-08'))
-
-        console.log('Extraction finished ... ');
+        console.log('\n INICIALIZANDO A EXTRACAO ... \n');
+        await this.exportservice.exportByDateRange(deviceIds, new Date(this.itrackDateSart), new Date(this.itrackDateEnd));
+        console.log('\n FINALIZANDO A EXTRACAO \n');
     }
 
 }
