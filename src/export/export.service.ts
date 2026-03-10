@@ -16,7 +16,7 @@ export class ExportService {
     async exportDaily(devices: string[]) {
         const date = new Date().toISOString().slice(0, 10);
         const folder = path.join('date', date);
-        const limit = pLimit(20)
+        const limit = pLimit(8)
         const start = `${date} 00:00:00`;
         const end = `${date} 23:59:59`;
 
@@ -50,7 +50,7 @@ export class ExportService {
         const folderName  = `${this.formateFolderDate(dateStart)}_${this.formateFolderDate(dateEnd)}`;
         const folder = path.join('exports',folderName);
 
-        const limit = pLimit(20);
+        const limit = pLimit(8);
 
         if(!fs.existsSync(folder)){
             fs.mkdirSync(folder,{recursive: true});
