@@ -13,7 +13,7 @@ export class ItracksafeService {
       }
 
     async queryTracks(deviceId: string, start: string, end: string){
-      //querytracks
+      
       const url = `${this.baseUrl}?action=querytracks&token=${this.token}`;
 
       //const { data } = await axios.post(url,{
@@ -24,7 +24,7 @@ export class ItracksafeService {
         timezone: 1, // UTC+1
       })
 
-    console.log(JSON.stringify(data, null, 2)+' \n ** gps data - ITrackSafeService - queryTracks **');
+    console.log(JSON.stringify(data, null, 2)+' \n ** GPS DATA DEVICES: ** \n');
 
     // const tracks = data?.records ?? [];
     const tracks = Array.isArray(data?.records) ? data.records : [];
@@ -51,7 +51,7 @@ export class ItracksafeService {
         updateTime: item.updatetime,
         latitude: item.callat,
         longitude: item.callon,
-        speed: item.speed/1000, // A API retorna a velocidade em m/s, convertendo para km/h
+        speed: item.speed/10, // A API retorna a velocidade em m/s, convertendo para km/h
         direction: item.course,
         address: item.address || '',
         // address: item.address;

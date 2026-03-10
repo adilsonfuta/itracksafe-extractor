@@ -2,26 +2,41 @@ import { Injectable } from "@nestjs/common";
 import { ExportService } from "src/export/export.service";
 import { Cron } from '@nestjs/schedule';
 import { ConfigService } from "@nestjs/config";
+import { Device } from "./interface/device.interface";
+import path from "path";
+import * as fs from 'fs';
 
 @Injectable()
-export class SchedulerService {
+export class SchedulerService{
 
-    private cronStart;
+    //private devices = ["6038131591","6038131650","6038132052","6038078555","6038052969"];
 
-    constructor( private readonly exportservice: ExportService, private readonly configservice: ConfigService
-    ){
-            this.cronStart = this.configservice.get('ITRACKSAFE_CRON')!;
-    }
+    private itrackDateSart;
+    private itrackDateEnd;
 
-    // carregar os devices de um arquivos ou arrays de devices
-    private devices = ["6038131591","6038131650","6038132052","6038078555","6038052969"];
+    constructor(
+         private readonly exportservice: ExportService, 
+        private readonly configservice: ConfigService ){
+            this.itrackDateSart = this.configservice.get('ITRACKSAFE_DATE_START');
+             this.itrackDateEnd = this.configservice.get('ITRACKSAFE_DATE_END');
+         }
+
+      // carregar os devices de um arquivos ou arrays de devices
+      private loadDevices():Device[]{
+        const filePath = path.join(process.cwd(),'src','devices','devices.json');
+        const raw = fs.readFileSync(filePath,'utf-8');
+        return JSON.parse(raw);
+      }
     
-   // @Cron('0 1 * * *')
-   @Cron('*/5 * * * *')
+   
+    @Cron('*/15 * * * *')
     async handleDailyExport(){
-        console.log('Daily extraction started ... ');
-        await this.exportservice.exportDaily(this.devices);
-        console.log('Daily extraction started ... ');
+
+        const allDevices = this.loadDevices();
+        const deviceIds = allDevices.map(d => d.deviceid);
+        console.log('\n INICIALIZANDO A EXTRACAO ... \n');
+        await this.exportservice.exportByDateRange(deviceIds, new Date(this.itrackDateSart), new Date(this.itrackDateEnd));
+        console.log('\n FINALIZANDO A EXTRACAO \n');
     }
 
 }
