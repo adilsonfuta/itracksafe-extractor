@@ -5,7 +5,7 @@ import { ConfigService } from "@nestjs/config";
 import { Device } from "./interface/device.interface";
 import path from "path";
 import * as fs from 'fs';
-import { DeviceService } from "src/helpers/device.service";
+import { DeviceService } from "src/helper/device.service";
 
 @Injectable()
 export class SchedulerService {
@@ -25,7 +25,7 @@ export class SchedulerService {
     }
 
 
-    @Cron('*/15 * * * *')
+    @Cron('*/58 * * * *')
     async handleDailyExport() {
         try {
             const allDevices = this.deviceservice.getAll();
