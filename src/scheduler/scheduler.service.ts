@@ -25,7 +25,7 @@ export class SchedulerService {
     }
 
 
-    @Cron('*/58 * * * *')
+    @Cron('*/15 * * * *')
     async handleDailyExport() {
         try {
             const allDevices = this.deviceservice.getAll();

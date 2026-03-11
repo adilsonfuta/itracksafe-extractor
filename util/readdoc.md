@@ -8,7 +8,9 @@ await this.exportByDateRange(
   new Date(),
 );
 */
-
+    //"start:dev": "nest start --watch",
+     //"start:prod": "node dist/main",
+    //"dev": "nest start --watch",
 
        // await this.exportservice.exportDaily(this.devices);
       //  await this.exportservice.exportByDateRange(deviceIds, new Date('2026-03-07'), new Date('2026-03-08'));
