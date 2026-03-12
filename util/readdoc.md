@@ -8,7 +8,9 @@ await this.exportByDateRange(
   new Date(),
 );
 */
-
+    //"start:dev": "nest start --watch",
+     //"start:prod": "node dist/main",
+    //"dev": "nest start --watch",
 
        // await this.exportservice.exportDaily(this.devices);
       //  await this.exportservice.exportByDateRange(deviceIds, new Date('2026-03-07'), new Date('2026-03-08'));
@@ -78,3 +80,30 @@ await this.exportByDateRange(
       endtime: item.endtime,
       
     }));
+
+
+
+        @Cron('*/15 * * * *')
+    async handleDailyExport() {
+        try {
+            const allDevices = this.deviceservice.getAll();
+            const deviceIds = allDevices.map(d => d.deviceid);
+            this.logger.log('\n Extraction Started \n');
+            await this.exportservice.exportByDateRange(deviceIds, new Date(this.itrackDateSart), new Date(this.itrackDateEnd));
+            this.logger.log('\n Extraction finished \n');
+
+        } catch (error) {
+            this.logger.error(`\n Export Failed: ${error.stack} \n`);
+        }
+
+    }
+
+
+    /*  
+//private devices = ["6038131591","6038131650","6038132052","6038078555","6038052969"];
+    private loadDevices():Device[]{
+        const filePath = path.join(process.cwd(),'src','devices','devices.json');
+        const raw = fs.readFileSync(filePath,'utf-8');
+        return JSON.parse(raw);
+      }
+*/ 
