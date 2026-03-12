@@ -8,7 +8,7 @@ import { ExportService } from './export/export.service';
 import { ExportModule } from './export/export.module';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { LoggerConfig } from './helpers/logger.config';
+import { LoggerConfig } from './helper/logger.config';
 
 @Module({
   imports: [

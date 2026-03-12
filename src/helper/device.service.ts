@@ -12,11 +12,11 @@ export class DeviceService{
             this.devices = this.loadDevices();
     }
 
-          private loadDevices():Device[]{
-            const filePath = path.join(process.cwd(),'src','devices','devices.json');
-            const raw = fs.readFileSync(filePath,'utf-8');
-            return JSON.parse(raw);
-          }
+    private loadDevices():Device[]{
+        const filePath = path.join(process.cwd(),'src','devices','devices.json');
+        const raw = fs.readFileSync(filePath,'utf-8');
+        return JSON.parse(raw);
+    }
 
     getAll(){
         return this.devices;

@@ -12,3 +12,5 @@ npm install --save-dev @types/parse-json --legacy-peer-deps
 npm install winston nest-winston
 
 $ npm install winston nest-winston --legacy-peer-deps
+
+npm install --save-dev cross-env --legacy-peer-deps
