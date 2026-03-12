@@ -1,66 +1,72 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService} from '@nestjs/config';
+import { Injectable, Logger} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
 @Injectable()
 export class ItracksafeService {
+  private token;
+  private baseUrl;
+  private logger; //  = new Logger(ItracksafeService.name);
 
-     private token;
-      private baseUrl = 'https://itracksafe.com/webapi';
+  constructor(private readonly configservice: ConfigService) {
+    this.token = configservice.get('ITRACKSAFE_TOKEN');
+    this.baseUrl = configservice.get('ITRACKSAFE_BASE_URL');
+    this.logger = new Logger(ItracksafeService.name);
+  }
 
-      constructor(private readonly configservice: ConfigService){
-            this.token = configservice.get('ITRACKSAFE_TOKEN');
-      }
+  async queryTracks(deviceId: string, start: string, end: string) {
+    const url = `${this.baseUrl}?action=querytracks&token=${this.token}`;
 
-    async queryTracks(deviceId: string, start: string, end: string){
-      
-      const url = `${this.baseUrl}?action=querytracks&token=${this.token}`;
+    const { data } = await axios.post(url, {
+      deviceid: deviceId,
+      starttime: start,
+      endtime: end,
+      timezone: 1,
+    });
 
-      //const { data } = await axios.post(url,{
-      const { data } = await axios.post(url,{
-        deviceid: deviceId,
-        starttime: start,
-        endtime: end,
-        timezone: 1, // UTC+1
-      })
+    // this.logger.log(`\n \n ${JSON.stringify(data, null, 2)}  `);
 
-    console.log(JSON.stringify(data, null, 2)+' \n ** GPS DATA DEVICES: ** \n');
-
-    // const tracks = data?.records ?? [];
     const tracks = Array.isArray(data?.records) ? data.records : [];
 
-    if(!tracks.length){
-        console.log(`Nenhum track para device ${deviceId}`);
-        return [];
-    } 
-
-    console.log(`Encontrados ${tracks.length} registros`);
-
-    for(const track of tracks){
-      console.log(`
-      \n Track updateTime: ${track.updatetime}, 
-       \n lat: ${track.callat},
-       \n lon: ${track.callon},
-       \n speed: ${track.speed}, 
-       \n course: ${track.course}, 
-       \naddress: ${track.address}`);
+    if (!tracks.length) {
+      this.logger.warn(`Nenhum track para device ${deviceId}`);
+      return [];
     }
 
-    
-     return tracks.map((item) => ({
-        updateTime: item.updatetime,
-        latitude: item.callat,
-        longitude: item.callon,
-        speed: item.speed/10, // A API retorna a velocidade em m/s, convertendo para km/h
-        direction: item.course,
-        address: item.address || '',
-        // address: item.address;
-        // A API não retorna o endereço, então deixamos vazio ou podemos implementar uma função para obter o endereço a partir das coordenadas
-     }));
-      
-    }
+     this.logger.warn(`Encontrados ${tracks.length} registros`);
 
 
+return tracks.map((item) => {
 
+  const speed = item.speed / 10;
 
+  return {
+    deviceid: deviceId,
+
+    datetime: new Date(item.updatetime).toISOString(),
+
+    latitude: item.callat,
+    longitude: item.callon,
+
+    speed_kmh: speed > 300 ? 0 : speed,
+    course_deg: item.course,
+
+    status: item.strstatusen,
+
+    distance_m: item.totaldistance,
+    altitude_m: item.altitude,
+
+    positioning: item.gotsrc,
+
+    alarm: item.stralarmen ?? '',
+
+    track_points: item.trackCount,
+
+    start_time: new Date(item.starttime).toISOString(),
+    end_time: new Date(item.endtime).toISOString(),
+  };
+});
+
+  
+}
 }
